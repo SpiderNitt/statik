@@ -30,16 +30,16 @@ const cwd = process.cwd();
 switch (program.args[0]) {
   case "init":
     const ipfs_node_url = program.args[1]
-    await Init(cwd,ipfs_node_url);
+    Init(cwd,ipfs_node_url);
     break;
   case "add":
-    await Add(cwd, program.args.slice(1));
+    Add(cwd, program.args.slice(1));
     break;
   case "commit":
-    await Commit(cwd, program.args[1]);
+    Commit(cwd, program.args[1]);
     break;
   case "log":
-    await Log(cwd);
+    Log(cwd);
     break;
   default:
     program.outputHelp();

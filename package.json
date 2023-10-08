@@ -2,7 +2,7 @@
   "name": "statik",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "exports": "./dist/index.js",
   "scripts": {
     "build": "npx tsc",
     "start": "npx ts-node --esm src/index.ts",
@@ -17,7 +17,7 @@
   "dependencies": {
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
-    "ipfs-http-client": "^60.0.1"
+    "ipfs-http-client": "^52.0.4-rc.4"
   },
   "devDependencies": {
     "@types/figlet": "^1.5.6",
