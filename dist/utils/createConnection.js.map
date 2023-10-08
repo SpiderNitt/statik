@@ -1,0 +1,1 @@
+{"version":3,"file":"createConnection.js","sourceRoot":"","sources":["../../src/utils/createConnection.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,MAAM,EAAC,MAAM,kBAAkB,CAAA;AAEvC,MAAM,CAAC,KAAK,UAAU,gBAAgB,CAAC,aAAoB;IACvD,MAAM,IAAI,GAAG,MAAM,CAAC,EAAC,GAAG,EAAC,aAAa,EAAC,CAAC,CAAA;IACxC,OAAO,IAAI,CAAA;AACf,CAAC"}

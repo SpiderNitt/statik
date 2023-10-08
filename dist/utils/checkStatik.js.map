@@ -1,0 +1,1 @@
+{"version":3,"file":"checkStatik.js","sourceRoot":"","sources":["../../src/utils/checkStatik.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,IAAI,CAAA;AACnB,MAAM,UAAU,QAAQ,CAAC,GAAW;IAChC,IAAG,CAAC,EAAE,CAAC,UAAU,CAAC,GAAG,GAAC,UAAU,CAAC,EAAC;QAC9B,OAAO,CAAC,KAAK,CAAC,kCAAkC,CAAC,CAAA;QACjD,OAAO,CAAC,IAAI,CAAC,CAAC,CAAC,CAAA;KAClB;AACL,CAAC"}
