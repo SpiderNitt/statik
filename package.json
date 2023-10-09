@@ -1,7 +1,7 @@
 {
-  "name": "statik",
+  "name": "statikvc",
   "version": "1.0.0",
-  "description": "",
+  "description": "An IPFS based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, and logging have been implemented. (Under active development)",
   "exports": "./dist/index.js",
   "scripts": {
     "build": "npx tsc",
@@ -11,8 +11,8 @@
   "bin": {
     "statik": "./dist/index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["version-control","ipfs","p2p","web3","filestorage"],
+  "author": "Santhosh Murugaiah",
   "license": "ISC",
   "dependencies": {
     "commander": "^11.0.0",

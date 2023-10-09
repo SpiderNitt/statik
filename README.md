@@ -27,12 +27,12 @@ $ npm start
 ```
 - or from Node Package Manager,
 ```bash
-$ npm install -g statik
+$ npm install -g statikvc
 ```
 
 ### Usage
 ```bash
-$ statik help
+$ statikvc help
 ```
 **Options:**
 ```
