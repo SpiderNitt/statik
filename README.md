@@ -32,7 +32,7 @@ $ npm install -g statikvc
 
 ### Usage
 ```bash
-$ statikvc help
+$ statik help
 ```
 **Options:**
 ```
