@@ -2,6 +2,9 @@ import { create, globSource } from "ipfs-http-client";
 import { IsStatik } from "../utils/checkStatik.js";
 import fs from 'fs';
 import { FetchConfig } from "../utils/fetchConfig.js";
+// If order of elements changes, the hash changes
+// Fix the logic (Sort maybe?)
+// Accept file path '.'
 export async function Add(cwd, paths) {
     IsStatik(cwd);
     const client = create({ url: FetchConfig(cwd).ipfs_node_url });
@@ -9,7 +12,7 @@ export async function Add(cwd, paths) {
     if (!prevCommit.length) {
         let snapshot = [];
         for (const path of paths) {
-            for await (const result of client.addAll(globSource(path, '**/*'))) {
+            for await (const result of client.addAll(globSource(path, { recursive: true }))) {
                 snapshot.push(result);
             }
         }
@@ -33,7 +36,7 @@ export async function Add(cwd, paths) {
         }
         // Not optimized
         for (const path of paths) {
-            for await (const result of client.addAll(globSource(path, '**/*'))) {
+            for await (const result of client.addAll(globSource(path, { recursive: true }))) {
                 for (const prev of prevContent) {
                     if (prev.path == result.path) {
                         prevContent.splice(prevContent.indexOf(prev), 1);
