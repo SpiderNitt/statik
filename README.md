@@ -1,10 +1,12 @@
 # Statik
 
 ```
+  ____  _        _   _ _    
  / ___|| |_ __ _| |_(_) | __
  \___ \| __/ _` | __| | |/ /
   ___) | || (_| | |_| |   < 
  |____/ \__\__,_|\__|_|_|\_\
+
  ```
 An IPFS-based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, and logging have been implemented. (**Under development**)
 ### Description 
