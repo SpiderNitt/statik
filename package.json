@@ -11,6 +11,10 @@
   "bin": {
     "statik": "./dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SANTHOSH17-DOT/statik"
+  },
   "keywords": ["version-control","ipfs","p2p","web3","filestorage"],
   "author": "Santhosh Murugaiah",
   "license": "ISC",
