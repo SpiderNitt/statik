@@ -1,5 +1,4 @@
 # Statik
-
 ```
   ____  _        _   _ _    
  / ___|| |_ __ _| |_(_) | __
@@ -8,7 +7,10 @@
  |____/ \__\__,_|\__|_|_|\_\
 
  ```
-An IPFS-based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, and logging have been implemented. (**Under development**)
+An IPFS-based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, and logging have been implemented. (**Under active development**)
+
+![ezgif com-gif-maker (2)](https://github.com/SANTHOSH17-DOT/statik/assets/74037707/ed92b139-5882-494e-8303-acc1e0785dd1)
+
 ### Description 
 Statik is a version control tool built on the InterPlanetary File System (IPFS). This project leverages content addressing through the linked hash data storage format within IPFS. Furthermore, data remains immutable and decentralized. In IPFS, data is divided into chunks and distributed across multiple peers. Consequently, traditional version control tools, like Git repositories, cannot be stored directly, as they expect a single blob. Statik is a viable alternative to centralized repository hosting services such as GitHub.
 
