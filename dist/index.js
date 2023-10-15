@@ -9,7 +9,7 @@ console.log(figlet.textSync("Statik"));
 const program = new Command();
 program
     .name("statik")
-    .version("1.0.0")
+    .version("1.0.4-alpha")
     .description("An IPFS based version control system with static file hosting features");
 program.command("init <ipfs_node_url>").description("Initialize a new Statik repository");
 program.command("add [file_path]").description("Add a file to the Statik repository");
