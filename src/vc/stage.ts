@@ -11,7 +11,8 @@ export async function Add(cwd:string,paths:string[]){
             return
         }
         const client = create({url: FetchConfig(cwd).ipfs_node_url})
-        const prevCommit = fs.readFileSync(cwd+"/.statik/HEAD").toString()
+        const branch = fs.readFileSync(cwd+"/.statik/HEAD").toString()
+        const prevCommit = fs.readFileSync(cwd+"/.statik/heads/"+branch).toString()
         if(!prevCommit.length){
             let snapshot=[];
             for (const path of paths){

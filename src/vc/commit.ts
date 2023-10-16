@@ -11,7 +11,8 @@ export async function Commit(cwd: string,message: string){
             process.exit(1)
         }
         const client = create({url: FetchConfig(cwd).ipfs_node_url})
-        const prevCommit = fs.readFileSync(cwd+"/.statik/HEAD").toString()
+        const branch = fs.readFileSync(cwd+"/.statik/HEAD").toString()
+        const prevCommit = fs.readFileSync(cwd+"/.statik/heads/"+branch).toString()
         const commit = {
             prevCommit: prevCommit,
             snapshot: snapshot,
@@ -19,7 +20,7 @@ export async function Commit(cwd: string,message: string){
             timestamp: Date.now()
         }
         const result = await client.add(JSON.stringify(commit))
-        fs.writeFileSync(cwd+"/.statik/HEAD",result.path)
+        fs.writeFileSync(cwd+"/.statik/heads/"+branch,result.path)
         fs.writeFileSync(cwd+"/.statik/SNAPSHOT","")
         console.log(
             "Committed to IPFS with hash: "+result.path
