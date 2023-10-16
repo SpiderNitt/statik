@@ -4,7 +4,7 @@ export async function Init(cwd, ipfs_node_url) {
         let reinitialize = false;
         if (fs.existsSync(cwd + "/.statik")) {
             reinitialize = true;
-            fs.rmSync(cwd + "/.statik", { recursive: true });
+            fs.rmdirSync(cwd + "/.statik", { recursive: true });
         }
         fs.mkdirSync(cwd + "/.statik");
         fs.mkdirSync(cwd + "/.statik/refs/heads", { recursive: true });
