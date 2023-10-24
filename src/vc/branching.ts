@@ -1,7 +1,8 @@
-import { create } from "ipfs-http-client";
+import { create,CID } from "ipfs-http-client";
 import { IsStatik } from "../utils/checkStatik.js";
 import fs from 'fs'
 import { FetchConfig } from "../utils/fetchConfig.js";
+import Path from 'path'
 export async function List(cwd: string){
     try{
         IsStatik(cwd)
@@ -47,20 +48,26 @@ export async function Jump(cwd: string,branch: string){
                 prevContent = JSON.parse(data)
             }
             // Fetch file content from the prev commit
+            // Figure out how to reconstruct the file structure
             for(const obj of prevContent){
-                console.log(obj)
                 const path = obj.path 
                 // Derive CID !!!
-                const cid = obj.cid
+                const {code,version,hash} = obj.cid
+                const bytes = new Uint8Array(Object.values(hash))
+                const cid = new CID(version,code,obj.cid,bytes)
+                // console.log(cid,path)
                 const asyncitr = client.cat(cid)
-                let content = []
                 for await(const itr of asyncitr){
                     const data = Buffer.from(itr).toString()
-                    content = JSON.parse(data)
+                    const dirname = Path.dirname(cwd+"/"+path)
+                    if(fs.existsSync(dirname)){
+                        fs.rmSync(cwd+"/"+path,{recursive:true})
+                    }
+                    fs.mkdirSync(dirname,{recursive:true})
+                    fs.writeFileSync(path,data)
                 }
-                console.log(path)
-                console.log(content)
             }
+            fs.writeFileSync(cwd+"/.statik/HEAD",branch);
         }
     }catch(err){
         console.error(err)

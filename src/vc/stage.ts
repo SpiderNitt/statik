@@ -2,6 +2,7 @@ import { create, globSource } from "ipfs-http-client";
 import { IsStatik } from "../utils/checkStatik.js";
 import fs from 'fs'
 import { FetchConfig } from "../utils/fetchConfig.js";
+import Path from 'path'
 export async function Add(cwd:string,paths:string[]){
     try{
         IsStatik(cwd)
@@ -17,6 +18,7 @@ export async function Add(cwd:string,paths:string[]){
             let snapshot=[];
             for (const path of paths){
                 for await (const result of client.addAll(globSource(path,{recursive:true}))) {
+                    if(fs.statSync(cwd+"/"+path).isDirectory()) continue;
                     snapshot.push(result)
                 }
             }
@@ -42,6 +44,9 @@ export async function Add(cwd:string,paths:string[]){
             // Not optimized
             for (const path of paths){
                 for await (const result of client.addAll(globSource(path,{recursive:true}))) {
+                    // Check if the path is a directory
+                    const path = result.path
+                    if(fs.statSync(cwd+"/"+path).isDirectory()) continue;
                     let flag = true
                     for(const prev of prevContent){
                         if(prev.path==result.path){
