@@ -31,6 +31,12 @@ export async function Jump(cwd: string,branch: string){
             return
         }
         const currentHead = fs.readFileSync(cwd+"/.statik/heads/"+currentBranch).toString()
+        // Check for staged changes
+        if(fs.readFileSync(cwd+"/.statik/SNAPSHOT").toString().length){
+            console.log("There are staged changes. You cannot switch branch without commiting it")
+            return
+        }
+
         if(!fs.existsSync(cwd+"/.statik/heads/"+branch)){
             console.log("Branching out to "+branch+"...")
             fs.writeFileSync(cwd+"/.statik/heads/"+branch,currentHead)
@@ -51,6 +57,7 @@ export async function Jump(cwd: string,branch: string){
                 const data = Buffer.from(itr).toString()
                 prevContent = JSON.parse(data)
             }
+            // Check if there are overriding changes!!!
             // Find the basepath and recursively delete all files
             let basepathCount=Infinity;
             let index = 0

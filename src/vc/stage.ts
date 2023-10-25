@@ -59,6 +59,11 @@ export async function Add(cwd:string,paths:string[]){
                 }
             }
             const result = await client.add(JSON.stringify(prevContent))
+            // console.log(result.path,prevSnapshot)
+            if(result.path==prevSnapshot){
+                console.log("There are no changes to add")
+                return
+            }
             fs.writeFileSync(cwd+"/.statik/SNAPSHOT",result.path)
             console.log(
                 "Files staged to IPFS with cid: "+result.path
