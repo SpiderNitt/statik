@@ -26,6 +26,10 @@ export async function Jump(cwd: string,branch: string){
     try{
         IsStatik(cwd)
         const currentBranch = fs.readFileSync(cwd+"/.statik/HEAD").toString()
+        if(branch===currentBranch){
+            console.log("Already on branch "+branch)
+            return
+        }
         const currentHead = fs.readFileSync(cwd+"/.statik/heads/"+currentBranch).toString()
         if(!fs.existsSync(cwd+"/.statik/heads/"+branch)){
             console.log("Branching out to "+branch+"...")
@@ -47,11 +51,23 @@ export async function Jump(cwd: string,branch: string){
                 const data = Buffer.from(itr).toString()
                 prevContent = JSON.parse(data)
             }
-            // Fetch file content from the prev commit
-            // Figure out how to reconstruct the file structure
+            // Find the basepath and recursively delete all files
+            let basepathCount=Infinity;
+            let index = 0
+            if(prevContent.length>0){
+                basepathCount = prevContent[0].path.split("/").length
+            }
+            for(let i=1;i<prevContent.length;i++){
+                if(prevContent[i].path.split("/").length<basepathCount){
+                    basepathCount = prevContent[i].path.split("/").length
+                    index = i
+                }
+            }
+            const basepath = Path.dirname(prevContent[index].path)
+            fs.rmSync(cwd+"/"+basepath,{recursive:true})
             for(const obj of prevContent){
                 const path = obj.path 
-                // Derive CID !!!
+                // Derive CID 
                 const {code,version,hash} = obj.cid
                 const bytes = new Uint8Array(Object.values(hash))
                 const cid = new CID(version,code,obj.cid,bytes)
@@ -60,10 +76,9 @@ export async function Jump(cwd: string,branch: string){
                 for await(const itr of asyncitr){
                     const data = Buffer.from(itr).toString()
                     const dirname = Path.dirname(cwd+"/"+path)
-                    if(fs.existsSync(dirname)){
-                        fs.rmSync(cwd+"/"+path,{recursive:true})
+                    if(!fs.existsSync(dirname)){
+                        fs.mkdirSync(dirname,{recursive:true})
                     }
-                    fs.mkdirSync(dirname,{recursive:true})
                     fs.writeFileSync(path,data)
                 }
             }
