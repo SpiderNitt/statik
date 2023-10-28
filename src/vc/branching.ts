@@ -3,6 +3,7 @@ import { IsStatik } from "../utils/checkStatik.js";
 import fs from 'fs'
 import { FetchConfig } from "../utils/fetchConfig.js";
 import Path from 'path'
+import { multihashToCID } from "../utils/cid.js";
 export async function List(cwd: string){
     try{
         IsStatik(cwd)
@@ -57,7 +58,6 @@ export async function Jump(cwd: string,branch: string){
                 const data = Buffer.from(itr).toString()
                 prevContent = JSON.parse(data)
             }
-            // Check if there are overriding changes!!!
             // Find the basepath and recursively delete all files
             let basepathCount=Infinity;
             let index = 0
@@ -71,13 +71,15 @@ export async function Jump(cwd: string,branch: string){
                 }
             }
             const basepath = Path.dirname(prevContent[index].path)
+            // 1 -> Identify unstaged changes
+            // 2 -> Check if there are overriding changes and prevent jump!!!
+            // 3 -> If new files are added, add them to the jumped branch without deleting them
+            // 4 -> If files are deleted, delete them from the jumped branch (Consider as overriding changes)
             fs.rmSync(cwd+"/"+basepath,{recursive:true})
             for(const obj of prevContent){
                 const path = obj.path 
-                // Derive CID 
-                const {code,version,hash} = obj.cid
-                const bytes = new Uint8Array(Object.values(hash))
-                const cid = new CID(version,code,obj.cid,bytes)
+                // Derive CID from multihash
+                const cid = multihashToCID(obj.cid)
                 // console.log(cid,path)
                 const asyncitr = client.cat(cid)
                 for await(const itr of asyncitr){
