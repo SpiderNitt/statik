@@ -1,25 +1,35 @@
 import { IPFSHTTPClient } from "ipfs-http-client/dist/src/types";
-import fs from 'fs'
-export async function findChanges(cwd:string,client: IPFSHTTPClient,commit:string){
-    const currentFiles = fs.readdirSync(cwd)
-    console.log(currentFiles)
-    let asyncitr = client.cat(commit)
-    let prevSnapshot = "";
-    for await(const itr of asyncitr){
+import fs, { read } from 'fs'
+import { multihashToCID } from "./cid.js";
+import { readAllFiles } from "./dirwalk.js";
+const checkChange = async(currentFiles:string[],prevContent:any[],file:string,client: IPFSHTTPClient,cwd:string) => {
+    if(!currentFiles.includes(file)) return false
+    const prevFile = prevContent.find((f: any) => f.path === file)
+    // console.log(prevFile)
+    const cid = multihashToCID(prevFile.cid)
+    // console.log(cid,path)
+    const asyncitr = client.cat(cid)
+    for await (const itr of asyncitr) {
         const data = Buffer.from(itr).toString()
-        prevSnapshot = JSON.parse(data).snapshot
+        // console.log(data,fs.readFileSync(cwd +"/"+ file).toString())
+        if (data !== fs.readFileSync(cwd +"/"+ file).toString()) return true;
     }
-    let prevContent = [];
-    asyncitr = client.cat(prevSnapshot)
-    for await(const itr of asyncitr){
-        const data = Buffer.from(itr).toString()
-        prevContent = JSON.parse(data)
+    return false
+}
+export async function isOverriding(cwd: string, client: IPFSHTTPClient, prevContent:any[]) {
+    let overrides = false;
+    const currentFiles = [...readAllFiles(cwd)]
+    // console.log(currentFiles)
+    const prevFiles = prevContent.map((file: any) => file.path)
+    // console.log(prevFiles)
+    const added = currentFiles.filter((file: any) => !prevFiles.includes(file))
+    const deleted = prevFiles.filter((file: any) => !currentFiles.includes(file))
+    if (deleted.length) overrides = true;
+    let changed = []
+    for (const file of prevFiles) {
+        if (await checkChange(currentFiles,prevContent,file,client,cwd)) changed.push(file)
     }
-    const prevFiles = prevContent.map((file:any)=>file.path)
-    const added = currentFiles.filter((file:any)=>!prevFiles.includes(file))
-    const deleted = prevFiles.filter((file:any)=>!currentFiles.includes(file))
-    // Compare file hashes
-    // Get prev file content
-    // const changed = currentFiles.filter((file:any)=>prevFiles.includes(file))
-    
+    if (changed.length) overrides = true;
+    // console.log(overrides,added,deleted,changed)
+    return {overrides:true,newFiles:added,deletedFiles:deleted,updated:changed};
 }

@@ -4,6 +4,8 @@ import fs from 'fs'
 import { FetchConfig } from "../utils/fetchConfig.js";
 import Path from 'path'
 import { multihashToCID } from "../utils/cid.js";
+import { isOverriding } from "../utils/changes.js";
+import { commitContent } from "../utils/fetchContent.js";
 export async function List(cwd: string){
     try{
         IsStatik(cwd)
@@ -44,39 +46,39 @@ export async function Jump(cwd: string,branch: string){
             fs.writeFileSync(cwd+"/.statik/HEAD",branch);
         }else{
             const commitId = fs.readFileSync(cwd+"/.statik/heads/"+branch).toString()
-            console.log("Switching to branch "+branch+"\n"+"Head commit <"+commitId+">")
             const client = create({url: FetchConfig(cwd).ipfs_node_url})
-            let asyncitr = client.cat(commitId)
-            let prevSnapshot = "";
-            for await(const itr of asyncitr){
-                const data = Buffer.from(itr).toString()
-                prevSnapshot = JSON.parse(data).snapshot
+            console.log("Switching to branch "+branch+"\n"+"Head commit <"+commitId+">")
+            const newBranchContent = await commitContent(commitId,client)
+            const {} = await isOverriding(cwd,client,newBranchContent)
+            // Check for unstaged changes
+            const oldBranchContent = await commitContent(currentHead,client)
+            const {overrides:newChanges} = await isOverriding(cwd,client,oldBranchContent)
+            // If there are unstaged changes, check if they are overriding changes
+            const overrides = await isOverriding(cwd,client,newBranchContent)
+            if(overrides.overrides){
+                console.log("There are overriding changes. You cannot switch branch without commiting it")
+                return
             }
-            let prevContent = [];
-            asyncitr = client.cat(prevSnapshot)
-            for await(const itr of asyncitr){
-                const data = Buffer.from(itr).toString()
-                prevContent = JSON.parse(data)
-            }
+            
             // Find the basepath and recursively delete all files
             let basepathCount=Infinity;
             let index = 0
-            if(prevContent.length>0){
-                basepathCount = prevContent[0].path.split("/").length
+            if(newBranchContent.length>0){
+                basepathCount = newBranchContent[0].path.split("/").length
             }
-            for(let i=1;i<prevContent.length;i++){
-                if(prevContent[i].path.split("/").length<basepathCount){
-                    basepathCount = prevContent[i].path.split("/").length
+            for(let i=1;i<newBranchContent.length;i++){
+                if(newBranchContent[i].path.split("/").length<basepathCount){
+                    basepathCount = newBranchContent[i].path.split("/").length
                     index = i
                 }
             }
-            const basepath = Path.dirname(prevContent[index].path)
+            const basepath = Path.dirname(newBranchContent[index].path)
             // 1 -> Identify unstaged changes
             // 2 -> Check if there are overriding changes and prevent jump!!!
             // 3 -> If new files are added, add them to the jumped branch without deleting them
             // 4 -> If files are deleted, delete them from the jumped branch (Consider as overriding changes)
             fs.rmSync(cwd+"/"+basepath,{recursive:true})
-            for(const obj of prevContent){
+            for(const obj of newBranchContent){
                 const path = obj.path 
                 // Derive CID from multihash
                 const cid = multihashToCID(obj.cid)
