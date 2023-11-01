@@ -24,7 +24,7 @@ It's crucial to be mindful of what you stage with Statik. Since IPFS operates as
 Given Statik's continuous interaction with IPFS nodes, command execution speed may vary. We're actively optimizing performance to provide the best possible experience.
 
 ## Demo
-![ezgif com-gif-maker (2)](https://github.com/SANTHOSH17-DOT/statik/assets/74037707/ed92b139-5882-494e-8303-acc1e0785dd1)
+![demo](assets/demo.gif)
 
 ### Requirements
 - Node v18.17.1
