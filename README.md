@@ -1,4 +1,4 @@
-# Statik
+# Statik: Decentralized Version Control on IPFS
 ```
   ____  _        _   _ _    
  / ___|| |_ __ _| |_(_) | __
@@ -7,16 +7,24 @@
  |____/ \__\__,_|\__|_|_|\_\
 
  ```
+
 An IPFS-based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, and logging have been implemented. (**Under active development**)
 
+
+## Why Statik?
+Traditional version control tools, such as Git repositories, operate under the assumption of a single, centralized blob storage. In the world of IPFS, data is partitioned into chunks and distributed across a network of peers, resulting in an inherently decentralized and immutable data structure. Statik fills the void by enabling version control in this decentralized paradigm, making it a robust alternative to centralized repository hosting services like GitHub.
+
+## Features
+Statik is built as a Command Line Interface (CLI) tool using TypeScript, ensuring easy accessibility via the Node Package Manager (npm). Key functionalities have already been implemented, including repository initialization, staging changes, committing, and browsing commit history. We're actively working on adding essential features like branching, merging, commit authorship, and more. Moreover, we plan to utilize DNSLink to establish mutable pointers to commit Content Identifiers (CIDs), potentially turning Statik into an attractive alternative for static file hosting, like GitHub Pages.
+
+## Data Security
+It's crucial to be mindful of what you stage with Statik. Since IPFS operates as a transparent and immutable protocol, sensitive information should not be included in the staging process. It's a trade-off for the benefits of decentralization and immutability.
+
+## Performance Consideration
+Given Statik's continuous interaction with IPFS nodes, command execution speed may vary. We're actively optimizing performance to provide the best possible experience.
+
+## Demo
 ![ezgif com-gif-maker (2)](https://github.com/SANTHOSH17-DOT/statik/assets/74037707/ed92b139-5882-494e-8303-acc1e0785dd1)
-
-### Description 
-Statik is a version control tool built on the InterPlanetary File System (IPFS). This project leverages content addressing through the linked hash data storage format within IPFS. Furthermore, data remains immutable and decentralized. In IPFS, data is divided into chunks and distributed across multiple peers. Consequently, traditional version control tools, like Git repositories, cannot be stored directly, as they expect a single blob. Statik is a viable alternative to centralized repository hosting services such as GitHub.
-
-Statik is a Command Line Interface (CLI) tool developed using TypeScript and is readily available through the Node Package Manager (npm). So far, essential functions like initializing a repository, staging changes, committing, and viewing the commit history have been implemented. Other vital features, including branching, merging, commit authorship, and more, are actively in development. Additionally, DNSLink will be employed to create mutable pointers to commit Content Identifiers (CIDs). Therefore, Statik could be an alternative to static file hosting services, such as GitHub Pages.
-
-It's important to note that sensitive information should not be included in the staging process, given that IPFS operates as a transparent and immutable protocol. Another potential drawback is the command execution speed, as Statik must constantly interact with IPFS nodes.
 
 ### Requirements
 - Node v18.17.1
@@ -54,5 +62,9 @@ $ statik help
 
   log                   View the commit history of the Statik repository
 
+  branch                List all branches in the Statik repository
+  
+  jump <branch>         Switch between branches
+  
   help [command]        display help for command
 ```
