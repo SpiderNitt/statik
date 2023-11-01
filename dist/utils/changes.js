@@ -1,28 +1,25 @@
 import fs from 'fs';
 import { multihashToCID } from "./cid.js";
-import { readAllFiles } from "./dirwalk.js";
 const checkChange = async (currentFiles, prevContent, file, client, cwd) => {
     if (!currentFiles.includes(file))
         return false;
     const prevFile = prevContent.find((f) => f.path === file);
-    console.log(prevFile);
+    // console.log(prevFile)
     const cid = multihashToCID(prevFile.cid);
     // console.log(cid,path)
     const asyncitr = client.cat(cid);
     for await (const itr of asyncitr) {
         const data = Buffer.from(itr).toString();
-        console.log(data, fs.readFileSync(cwd + "/" + file).toString());
         if (data !== fs.readFileSync(cwd + "/" + file).toString())
             return true;
     }
     return false;
 };
-export async function isOverriding(cwd, client, prevContent) {
+export async function isOverriding(cwd, client, prevContent, currentFiles) {
     let overrides = false;
-    const currentFiles = [...readAllFiles(cwd)];
-    console.log(currentFiles);
+    // console.log(currentFiles)
     const prevFiles = prevContent.map((file) => file.path);
-    console.log(prevFiles);
+    // console.log(prevFiles)
     const added = currentFiles.filter((file) => !prevFiles.includes(file));
     const deleted = prevFiles.filter((file) => !currentFiles.includes(file));
     if (deleted.length)
@@ -34,7 +31,7 @@ export async function isOverriding(cwd, client, prevContent) {
     }
     if (changed.length)
         overrides = true;
-    console.log(overrides, added, deleted, changed);
-    return { overrides: true, newFiles: added, deletedFiles: deleted, updated: changed };
+    // console.log(overrides,added,deleted,changed)
+    return { overrides, newFiles: added, deletedFiles: deleted, updated: changed };
 }
 //# sourceMappingURL=changes.js.map

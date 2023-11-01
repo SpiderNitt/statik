@@ -1,7 +1,6 @@
 import { IPFSHTTPClient } from "ipfs-http-client/dist/src/types";
-import fs, { read } from 'fs'
+import fs from 'fs'
 import { multihashToCID } from "./cid.js";
-import { readAllFiles } from "./dirwalk.js";
 const checkChange = async(currentFiles:string[],prevContent:any[],file:string,client: IPFSHTTPClient,cwd:string) => {
     if(!currentFiles.includes(file)) return false
     const prevFile = prevContent.find((f: any) => f.path === file)
@@ -11,14 +10,12 @@ const checkChange = async(currentFiles:string[],prevContent:any[],file:string,cl
     const asyncitr = client.cat(cid)
     for await (const itr of asyncitr) {
         const data = Buffer.from(itr).toString()
-        // console.log(data,fs.readFileSync(cwd +"/"+ file).toString())
         if (data !== fs.readFileSync(cwd +"/"+ file).toString()) return true;
     }
     return false
 }
-export async function isOverriding(cwd: string, client: IPFSHTTPClient, prevContent:any[]) {
+export async function isOverriding(cwd: string, client: IPFSHTTPClient, prevContent:any[],currentFiles:string[]) {
     let overrides = false;
-    const currentFiles = [...readAllFiles(cwd)]
     // console.log(currentFiles)
     const prevFiles = prevContent.map((file: any) => file.path)
     // console.log(prevFiles)
@@ -31,5 +28,5 @@ export async function isOverriding(cwd: string, client: IPFSHTTPClient, prevCont
     }
     if (changed.length) overrides = true;
     // console.log(overrides,added,deleted,changed)
-    return {overrides:true,newFiles:added,deletedFiles:deleted,updated:changed};
+    return {overrides,newFiles:added,deletedFiles:deleted,updated:changed};
 }

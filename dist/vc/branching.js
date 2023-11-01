@@ -5,11 +5,12 @@ import { FetchConfig } from "../utils/fetchConfig.js";
 import Path from 'path';
 import { multihashToCID } from "../utils/cid.js";
 import { isOverriding } from "../utils/changes.js";
+import { commitContent } from "../utils/fetchContent.js";
+import { deleteAllFiles, readAllFiles } from "../utils/dirwalk.js";
 export async function List(cwd) {
     try {
         IsStatik(cwd);
         // List all files
-        console.log(cwd);
         const currentBranch = fs.readFileSync(cwd + "/.statik/HEAD").toString();
         const files = fs.readdirSync(cwd + "/.statik/heads");
         for (const file of files) {
@@ -48,22 +49,40 @@ export async function Jump(cwd, branch) {
             const commitId = fs.readFileSync(cwd + "/.statik/heads/" + branch).toString();
             const client = create({ url: FetchConfig(cwd).ipfs_node_url });
             console.log("Switching to branch " + branch + "\n" + "Head commit <" + commitId + ">");
-            let asyncitr = client.cat(commitId);
-            let prevSnapshot = "";
-            for await (const itr of asyncitr) {
-                const data = Buffer.from(itr).toString();
-                prevSnapshot = JSON.parse(data).snapshot;
+            const currentFiles = [...readAllFiles(cwd)];
+            // Check for unstaged changes
+            const oldBranchContent = await commitContent(currentHead, client);
+            const { overrides: hasUnstagedChanges, newFiles: addedFiles, updated: unstagedChanges, deletedFiles } = await isOverriding(cwd, client, oldBranchContent, currentFiles);
+            if (hasUnstagedChanges) {
+                if (unstagedChanges.length > 0) {
+                    console.log("\nUnstaged changes:");
+                    for (const file of unstagedChanges) {
+                        console.log(file);
+                    }
+                }
+                if (deletedFiles.length > 0) {
+                    console.log("\nDeleted files:");
+                    for (const file of deletedFiles) {
+                        console.log(file);
+                    }
+                }
+                console.log("\nThere are unstaged changes. You cannot switch branch without commiting it");
+                console.log("Abort");
+                process.exit(1);
             }
-            let newBranchContent = [];
-            asyncitr = client.cat(prevSnapshot);
-            for await (const itr of asyncitr) {
-                const data = Buffer.from(itr).toString();
-                newBranchContent = JSON.parse(data);
-            }
-            const overrides = await isOverriding(cwd, client, newBranchContent);
-            if (overrides.overrides) {
+            // Handle the case where not unstaged but overriding
+            // Solution: Prevent only if added files and deleted files are overriding
+            // Check for overriding changes
+            const newBranchContent = await commitContent(commitId, client);
+            const { newFiles, updated } = await isOverriding(cwd, client, newBranchContent, addedFiles);
+            if (updated.length > 0) {
+                console.log("Overriding changes:");
+                for (const file of updated) {
+                    console.log(file);
+                }
                 console.log("There are overriding changes. You cannot switch branch without commiting it");
-                return;
+                console.log("Abort");
+                process.exit(1);
             }
             // Find the basepath and recursively delete all files
             let basepathCount = Infinity;
@@ -77,12 +96,9 @@ export async function Jump(cwd, branch) {
                     index = i;
                 }
             }
+            // Conditionally delete files. Exempt new files under basepath
             const basepath = Path.dirname(newBranchContent[index].path);
-            // 1 -> Identify unstaged changes
-            // 2 -> Check if there are overriding changes and prevent jump!!!
-            // 3 -> If new files are added, add them to the jumped branch without deleting them
-            // 4 -> If files are deleted, delete them from the jumped branch (Consider as overriding changes)
-            fs.rmSync(cwd + "/" + basepath, { recursive: true });
+            deleteAllFiles(cwd + "/" + basepath, newFiles);
             for (const obj of newBranchContent) {
                 const path = obj.path;
                 // Derive CID from multihash
@@ -99,6 +115,7 @@ export async function Jump(cwd, branch) {
                 }
             }
             fs.writeFileSync(cwd + "/.statik/HEAD", branch);
+            return;
         }
     }
     catch (err) {
