@@ -8,7 +8,7 @@
 
  ```
 
-An IPFS-based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, and logging have been implemented. (**Under active development**)
+An IPFS-based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, branching, and logging have been implemented. (**Under active development**)
 
 
 ## Why Statik?
