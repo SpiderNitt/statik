@@ -7,7 +7,8 @@ export async function Log(cwd: string){
     try{
         IsStatik(cwd)
         const client = create({url: FetchConfig(cwd).ipfs_node_url})
-        let head = fs.readFileSync(cwd+"/.statik/HEAD").toString()
+        const branch = fs.readFileSync(cwd+"/.statik/HEAD").toString()
+        let head = fs.readFileSync(cwd+"/.statik/heads/"+branch).toString()
         let asyncitr = client.cat(head)
         console.log("Commit history: ")
         while(head.length){

@@ -5,16 +5,18 @@ import { Init } from "./vc/init.js";
 import { Add } from "./vc/stage.js";
 import { Commit } from "./vc/commit.js";
 import { Log } from "./vc/history.js";
-console.log(figlet.textSync("Statik"));
+import { Jump, List } from "./vc/branching.js";
 const program = new Command();
 program
     .name("statik")
     .version("1.0.5-alpha")
-    .description("An IPFS based version control system with static file hosting features");
+    .description(figlet.textSync("Statik") + "\nAn IPFS based version control system with static file hosting features");
 program.command("init <ipfs_node_url>").description("Initialize a new Statik repository");
 program.command("add [file_path]").description("Add a file to the Statik repository");
 program.command("commit <message>").description("Commit changes to the Statik repository");
-program.command("log").description("View the commit history of the Statik repository");
+program.command("log").description("View the commit history of the current branch");
+program.command("branch").description("List all branches in the Statik repository");
+program.command("jump <branch>").description("Switch between branches");
 program.parse(process.argv);
 if (program.args.length < 1) {
     program.outputHelp();
@@ -34,6 +36,12 @@ switch (program.args[0]) {
         break;
     case "log":
         Log(cwd);
+        break;
+    case "branch":
+        List(cwd);
+        break;
+    case "jump":
+        Jump(cwd, program.args[1]);
         break;
     default:
         program.outputHelp();

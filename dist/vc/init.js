@@ -6,9 +6,9 @@ export async function Init(cwd, ipfs_node_url) {
             reinitialize = true;
             fs.rmdirSync(cwd + "/.statik", { recursive: true });
         }
-        fs.mkdirSync(cwd + "/.statik");
-        fs.mkdirSync(cwd + "/.statik/refs/heads", { recursive: true });
-        fs.writeFileSync(cwd + "/.statik/HEAD", "");
+        fs.mkdirSync(cwd + "/.statik/heads", { recursive: true });
+        fs.writeFileSync(cwd + "/.statik/heads/main", "");
+        fs.writeFileSync(cwd + "/.statik/HEAD", "main");
         fs.writeFileSync(cwd + "/.statik/SNAPSHOT", "");
         fs.writeFileSync(cwd + "/.statik/CONFIG", JSON.stringify({
             ipfs_node_url: ipfs_node_url
