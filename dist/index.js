@@ -9,7 +9,7 @@ import { Jump, List } from "./vc/branching.js";
 const program = new Command();
 program
     .name("statik")
-    .version("1.0.5-alpha")
+    .version("1.1.0-alpha")
     .description(figlet.textSync("Statik") + "\nAn IPFS based version control system with static file hosting features");
 program.command("init <ipfs_node_url>").description("Initialize a new Statik repository");
 program.command("add [file_path]").description("Add a file to the Statik repository");
