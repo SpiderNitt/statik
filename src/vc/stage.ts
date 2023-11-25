@@ -42,6 +42,7 @@ export async function Add(cwd:string,paths:string[]){
                 prevContent = JSON.parse(data)
             }
             // Not optimized
+            // Todo: stage changes without pushing it to IPFS
             for (const path of paths){
                 for await (const result of client.addAll(globSource(path,{recursive:true}))) {
                     // Check if the path is a directory
@@ -49,12 +50,14 @@ export async function Add(cwd:string,paths:string[]){
                     if(fs.statSync(cwd+"/"+path).isDirectory()) continue;
                     let flag = true
                     for(const prev of prevContent){
+                        // Check for file changes
                         if(prev.path==result.path){
                             prevContent.splice(prevContent.indexOf(prev),1,result)
                             flag = false
                             break;
                         }
                     }
+                    // If the file is new
                     if(flag) prevContent.push(result)
                 }
             }
