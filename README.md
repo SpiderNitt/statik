@@ -23,6 +23,23 @@ It's crucial to be mindful of what you stage with Statik. Since IPFS operates as
 ## Performance Consideration
 Given Statik's continuous interaction with IPFS nodes, command execution speed may vary. We're actively optimizing performance to provide the best possible experience.
 
+## Why should you contribute to this project?
+- Learning Opportunities: Contribute to a project that combines IPFS and version control, gaining knowledge in both domains.
+- Open Source Spirit: Delve deep into the open source spirit, fostering transparency and allowing contributors to showcase their skills to a broader audience.
+- Impact: Make meaningful contributions that have the potential to revolutionise how version control is approached in a decentralised world.
+- New Technology: Work with the latest advancements in decentralised technologies and version control systems.
+
+## Target Audience
+- Developers
+- Open-source Enthusiasts
+- People having an interest in decentralisation
+
+## Goals
+- Decentralised version control system: Build a project that has version control features in a decentralised manner utilising IPFS
+- Multiuser support: Have multiple users author commits and have flexibility to branch out, merge branches etc.
+- Mutable pointers: Have a feature to host static content (similar to Github pages) and assign human readable URLs to them using IPNS (InterPlanetary Name System) and DNS linking. 
+- Scalability testing: Ensuring that Statik remains performant and reliable as the size of repositories and user interactions increases.
+
 ## Demo
 ![demo](assets/demo.gif)
 
@@ -68,3 +85,13 @@ $ statik help
   
   help [command]        display help for command
 ```
+
+## Contribution process and guidelines
+- Reporting issues: If you find any issues or bugs please create a new issue and provide detailed information.
+- Feature requests: We welcome feature requests. Please create a new issue and describe the proposed feature or improvement.
+- Pull requests:
+  - Fork the repository and create a new branch for your contribution.
+  - Make your changes and commit them.
+  - Push the changes to your fork.
+  - Create a pull request with title and description
+
