@@ -83,5 +83,5 @@ $ statik help
   
   jump <branch>         Switch between branches
   
-  help [command]        display help for command
+  help [command ]        display help for command
 ```
