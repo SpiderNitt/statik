@@ -6,7 +6,6 @@ import { Add } from "./vc/stage.js";
 import { Commit } from "./vc/commit.js";
 import { Log } from "./vc/history.js";
 import { Jump, List } from "./vc/branching.js";
-
 const program = new Command();
 program
   .name("statik")
@@ -47,6 +46,7 @@ switch (program.args[0]) {
   case "jump":
     Jump(cwd, program.args[1]);
     break;
+  
   default:
     program.outputHelp();
     process.exit(0)

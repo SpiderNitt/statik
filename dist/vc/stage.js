@@ -22,10 +22,9 @@ export async function Add(cwd, paths) {
                     snapshot.push(result);
                 }
             }
-            // console.log(snapshot)
             const result = await client.add(JSON.stringify(snapshot));
             fs.writeFileSync(cwd + "/.statik/SNAPSHOT", result.path);
-            console.log("Files staged to IPFS withmm cid: " + result.path);
+            console.log("Files staged to IPFS with cid: " + result.path);
         }
         else {
             let asyncitr = client.cat(prevCommit);
@@ -41,7 +40,7 @@ export async function Add(cwd, paths) {
                 prevContent = JSON.parse(data);
             }
             // Not optimized
-            let Content1 = [];
+            let newContent = [];
             for (const path of paths) {
                 for await (const result of client.addAll(globSource(path, { recursive: true }))) {
                     // Check if the path is a directory
@@ -49,20 +48,10 @@ export async function Add(cwd, paths) {
                     if (fs.statSync(cwd + "/" + path).isDirectory()) {
                         continue;
                     }
-                    Content1.push(result);
-                    // let flag = true
-                    // for(const prev of prevContent){
-                    //     if(prev.path==result.path){
-                    //         prevContent.splice(prevContent.indexOf(prev),1,result)
-                    //         flag = false
-                    //         break;
-                    //     }
-                    // }
-                    // if(flag) prevContent.push(result)
+                    newContent.push(result);
                 }
             }
-            const result = await client.add(JSON.stringify(Content1));
-            // console.log(result.path,prevSnapshot)
+            const result = await client.add(JSON.stringify(newContent));
             if (result.path == prevSnapshot) {
                 console.log("There are no changes to add");
                 return;

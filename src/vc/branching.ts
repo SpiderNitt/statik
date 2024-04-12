@@ -30,10 +30,8 @@ function deleteDirectoryRecursive(directoryPath:string,isfile:string) {
   if(isfile=="1"){
     deleteFile(directoryPath)
     .then(() => {
-        console.log(`File ${directoryPath} deleted successfully.`);
-    })
+             })
     .catch((err) => {
-        console.error(`Error deleting file ${directoryPath}: ${err}`);
     });
     return ;
   }
@@ -50,13 +48,11 @@ function deleteDirectoryRecursive(directoryPath:string,isfile:string) {
         } else {
             // Delete files
             fs.unlinkSync(itemPath);
-            console.log(`Deleted file: ${itemPath}`);
         }
     });
 
     // Finally, delete the empty directory
     fs.rmdirSync(directoryPath);
-    console.log(`Deleted directory: ${directoryPath}`);
 }
 export async function List(cwd: string){
     try{
@@ -147,22 +143,18 @@ isfile="1"
                 dir=basepathnew[0]+"/"
                 isfile="0"
             }
-console.log(basepathnew)
             const directoryPath=cwd+"/"+dir
 
 
 
             
            
-                    // Recursively delete subdirectories
                     deleteDirectoryRecursive(directoryPath,isfile);
-            // deleteAllFiles(cwd+"/"+basepath,newFiles)
             let data
             for (const obj of newBranchContent) {
                 const path = obj.path;
                 // Derive CID from multihash
                 const cid = multihashToCID(obj.cid);
-                // console.log(cid,path)
                 const asyncitr = client.cat(cid);
                 const dirname = Path.dirname(cwd + "/" + path);
                 for await (const itr of asyncitr) {
