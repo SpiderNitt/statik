@@ -13,10 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SANTHOSH17-DOT/statik"
+    "url": "git+https://github.com/SpiderNitt/statik"
   },
   "keywords": ["version-control","ipfs","p2p","web3","filestorage"],
-  "author": "Santhosh Murugaiah",
+  "author": "Spider R&D",
   "license": "ISC",
   "dependencies": {
     "commander": "^11.0.0",
