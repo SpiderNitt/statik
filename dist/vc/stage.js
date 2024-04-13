@@ -51,6 +51,15 @@ export async function Add(cwd, paths) {
                     newContent.push(result);
                 }
             }
+            let newContentaddedpaths = [];
+            newContent.forEach((e) => {
+                newContentaddedpaths.push(e.path);
+            });
+            prevContent.forEach((e) => {
+                if (!newContentaddedpaths.includes(e.path)) {
+                    newContent.push(e);
+                }
+            });
             const result = await client.add(JSON.stringify(newContent));
             if (result.path == prevSnapshot) {
                 console.log("There are no changes to add");

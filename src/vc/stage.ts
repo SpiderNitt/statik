@@ -4,6 +4,7 @@ import fs from 'fs'
 import { FetchConfig } from "../utils/fetchConfig.js";
 import Path from 'path'
 import { Duplex } from "stream";
+
 export async function Add(cwd:string,paths:string[]){
     try{
         IsStatik(cwd)
@@ -42,7 +43,7 @@ export async function Add(cwd:string,paths:string[]){
                 prevContent = JSON.parse(data)
             }
             // Not optimized
-            let newContent=[]
+            let newContent:any[]=[]
             for (const path of paths){
                 for await (const result of client.addAll(globSource(path,{recursive:true}))) {
                     // Check if the path is a directory
@@ -54,6 +55,19 @@ export async function Add(cwd:string,paths:string[]){
                    
                 }
             }
+let newContentaddedpaths:string[]=[];
+
+newContent.forEach((e:any)=>{
+    newContentaddedpaths.push(e.path);
+})
+
+prevContent.forEach((e:any)=>{
+    if(!newContentaddedpaths.includes(e.path)){
+        newContent.push(e);
+    }
+})
+
+          
             const result = await client.add(JSON.stringify(newContent))
             if(result.path==prevSnapshot){
                 console.log("There are no changes to add")

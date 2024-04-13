@@ -8,6 +8,46 @@ import { multihashToCID } from "../utils/cid.js";
 import { isOverriding } from "../utils/changes.js";
 import { commitContent } from "../utils/fetchContent.js";
 import { deleteAllFiles, readAllFiles } from "../utils/dirwalk.js";
+function deleteFoldersAndFilesExceptStatikAndPaths(cwd: string, pathsToKeep: string[]): void {
+    const statikPath = path.join(cwd, 'statik');
+
+    if (!fs.existsSync(statikPath)) {
+        return;
+    }
+
+    const filesAndFolders = fs.readdirSync(cwd);
+
+    for (const fileOrFolder of filesAndFolders) {
+        const filePath = path.join(cwd, fileOrFolder);
+
+        if (fileOrFolder === 'statik' || pathsToKeep.includes(filePath)) {
+            continue;
+        }
+
+        const stats = fs.statSync(filePath);
+
+        if (stats.isDirectory()) {
+            deleteFolderRecursive(filePath);
+        } else {
+            fs.unlinkSync(filePath);
+        }
+    }
+}
+
+function deleteFolderRecursive(folderPath: string): void {
+    if (fs.existsSync(folderPath)) {
+        fs.readdirSync(folderPath).forEach((file) => {
+            const curPath = path.join(folderPath, file);
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(folderPath);
+    }
+}
+
 function deleteFile(filePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
         // Use fs.unlink to delete the file
@@ -146,10 +186,12 @@ isfile="1"
             const directoryPath=cwd+"/"+dir
 
 
-
+let newBranchaddedpaths:string[]=[]
+newBranchContent.forEach((e:any)=>{
+    newBranchaddedpaths.push(e.path)
+})
             
-           
-                    deleteDirectoryRecursive(directoryPath,isfile);
+           deleteFoldersAndFilesExceptStatikAndPaths(cwd,newBranchaddedpaths)
             let data
             for (const obj of newBranchContent) {
                 const path = obj.path;
