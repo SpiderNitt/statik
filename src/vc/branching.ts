@@ -1,6 +1,6 @@
 import { create } from "ipfs-http-client";
 import { IsStatik } from "../utils/checkStatik.js";
-import fs from 'fs'
+import fs, { writeFileSync } from 'fs'
 import { FetchConfig } from "../utils/fetchConfig.js";
 import path from "path";
 import Path from 'path'
@@ -145,20 +145,43 @@ let newBranchaddedpaths:string[]=[]
 newBranchContent.forEach((e:any)=>{
     newBranchaddedpaths.push(e.path)
 })
-            
            deleteFoldersAndFilesExceptStatikAndPaths(cwd,newBranchaddedpaths)
             let data
+            let flag=false
             for (const obj of newBranchContent) {
-                const path = obj.path;
+                const path1 = obj.path;
                 // Derive CID from multihash
                 const cid = multihashToCID(obj.cid);
                 const asyncitr = client.cat(cid);
-                const dirname = Path.dirname(cwd + "/" + path);
+                const dirname = Path.dirname(cwd + "/" + path1);
+                fs.mkdirSync(dirname, { recursive: true });
                 for await (const itr of asyncitr) {
-                    fs.mkdirSync(dirname, { recursive: true });
                     data = Buffer.from(itr).toString();
-                    fs.writeFileSync(path, data);
+                    if(data){
+                        fs.writeFileSync(path1, data);
+                        console.log(data)
+                    }
+                    else{
+                    }
+                    flag=true
                 }
+                if (!flag){
+
+                
+                try {
+                    const directoryPath = path.join(cwd, path.dirname(path1));
+                    const fileName = path.basename(path1);
+            
+                    // Create the directory
+                    fs.mkdirSync(directoryPath, { recursive: true });
+            
+                    // Create the empty file
+                    fs.writeFileSync(path.join(directoryPath, fileName), '');
+                } catch (err) {
+                    console.error(`Error creating empty file: ${err}`);
+                }
+            }
+            flag=false;
             }
             fs.writeFileSync(cwd+"/.statik/HEAD",branch);
             return
