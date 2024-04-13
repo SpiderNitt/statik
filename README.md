@@ -50,7 +50,7 @@ Given Statik's continuous interaction with IPFS nodes, command execution speed m
 ### Installation
 - Run yourself,
 ```bash
-$ git clone https://github.com/SANTHOSH17-DOT/statik
+$ git clone https://github.com/SpiderNitt/statik
 $ npm i
 $ npm start
 ```
