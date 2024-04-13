@@ -2,11 +2,46 @@ import { create } from "ipfs-http-client";
 import { IsStatik } from "../utils/checkStatik.js";
 import fs from 'fs';
 import { FetchConfig } from "../utils/fetchConfig.js";
+import path from "path";
 import Path from 'path';
 import { multihashToCID } from "../utils/cid.js";
 import { isOverriding } from "../utils/changes.js";
 import { commitContent } from "../utils/fetchContent.js";
-import { deleteAllFiles, readAllFiles } from "../utils/dirwalk.js";
+import { readAllFiles } from "../utils/dirwalk.js";
+function deleteFolderRecursive(folderPath) {
+    if (fs.existsSync(folderPath)) {
+        fs.readdirSync(folderPath).forEach((file) => {
+            const curPath = path.join(folderPath, file);
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            }
+            else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(folderPath);
+    }
+}
+function deleteFoldersAndFilesExceptStatikAndPaths(cwd, pathsToKeep) {
+    const statikPath = path.join(cwd, '.statik');
+    if (!fs.existsSync(statikPath)) {
+        return;
+    }
+    const filesAndFolders = fs.readdirSync(cwd);
+    for (const fileOrFolder of filesAndFolders) {
+        const filePath = path.join(cwd, fileOrFolder);
+        if (fileOrFolder === '.statik' || pathsToKeep.includes(filePath)) {
+            continue;
+        }
+        const stats = fs.statSync(filePath);
+        if (stats.isDirectory()) {
+            deleteFolderRecursive(filePath);
+        }
+        else {
+            fs.unlinkSync(filePath);
+        }
+    }
+}
 export async function List(cwd) {
     try {
         IsStatik(cwd);
@@ -53,23 +88,6 @@ export async function Jump(cwd, branch) {
             // Check for unstaged changes
             const oldBranchContent = await commitContent(currentHead, client);
             const { overrides: hasUnstagedChanges, newFiles: addedFiles, updated: unstagedChanges, deletedFiles } = await isOverriding(cwd, client, oldBranchContent, currentFiles);
-            if (hasUnstagedChanges) {
-                if (unstagedChanges.length > 0) {
-                    console.log("\nUnstaged changes:");
-                    for (const file of unstagedChanges) {
-                        console.log(file);
-                    }
-                }
-                if (deletedFiles.length > 0) {
-                    console.log("\nDeleted files:");
-                    for (const file of deletedFiles) {
-                        console.log(file);
-                    }
-                }
-                console.log("\nThere are unstaged changes. You cannot switch branch without commiting it");
-                console.log("Abort");
-                process.exit(1);
-            }
             // Handle the case where not unstaged but overriding
             // Solution: Prevent only if added files and deleted files are overriding
             // Check for overriding changes
@@ -98,21 +116,57 @@ export async function Jump(cwd, branch) {
             }
             // Conditionally delete files. Exempt new files under basepath
             const basepath = Path.dirname(newBranchContent[index].path);
-            deleteAllFiles(cwd + "/" + basepath, newFiles);
+            let basepathnew;
+            let dir;
+            basepathnew = newBranchContent[0].path.split("/");
+            let isfile;
+            if (newBranchContent[0].path.split("/").length == 1) {
+                dir = basepathnew[0];
+                isfile = "1";
+            }
+            else {
+                dir = basepathnew[0] + "/";
+                isfile = "0";
+            }
+            const directoryPath = cwd + "/" + dir;
+            let newBranchaddedpaths = [];
+            newBranchContent.forEach((e) => {
+                newBranchaddedpaths.push(e.path);
+            });
+            deleteFoldersAndFilesExceptStatikAndPaths(cwd, newBranchaddedpaths);
+            let data;
+            let flag = false;
             for (const obj of newBranchContent) {
-                const path = obj.path;
+                const path1 = obj.path;
                 // Derive CID from multihash
                 const cid = multihashToCID(obj.cid);
-                // console.log(cid,path)
                 const asyncitr = client.cat(cid);
+                const dirname = Path.dirname(cwd + "/" + path1);
+                fs.mkdirSync(dirname, { recursive: true });
                 for await (const itr of asyncitr) {
-                    const data = Buffer.from(itr).toString();
-                    const dirname = Path.dirname(cwd + "/" + path);
-                    if (!fs.existsSync(dirname)) {
-                        fs.mkdirSync(dirname, { recursive: true });
+                    data = Buffer.from(itr).toString();
+                    if (data) {
+                        fs.writeFileSync(path1, data);
+                        console.log(data);
                     }
-                    fs.writeFileSync(path, data);
+                    else {
+                    }
+                    flag = true;
                 }
+                if (!flag) {
+                    try {
+                        const directoryPath = path.join(cwd, path.dirname(path1));
+                        const fileName = path.basename(path1);
+                        // Create the directory
+                        fs.mkdirSync(directoryPath, { recursive: true });
+                        // Create the empty file
+                        fs.writeFileSync(path.join(directoryPath, fileName), '');
+                    }
+                    catch (err) {
+                        console.error(`Error creating empty file: ${err}`);
+                    }
+                }
+                flag = false;
             }
             fs.writeFileSync(cwd + "/.statik/HEAD", branch);
             return;

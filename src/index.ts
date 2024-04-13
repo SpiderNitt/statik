@@ -6,12 +6,11 @@ import { Add } from "./vc/stage.js";
 import { Commit } from "./vc/commit.js";
 import { Log } from "./vc/history.js";
 import { Jump, List } from "./vc/branching.js";
-
 const program = new Command();
 program
   .name("statik")
   .version("1.1.0-alpha")
-  .description(figlet.textSync("Statik")+"\nAn IPFS based version control system with static file hosting features")
+  .description(figlet.textSync("Statik")+"\n  An IPFS based version control system with static file hosting features")
 program.command("init <ipfs_node_url>").description("Initialize a new Statik repository")
 program.command("add [file_path]").description("Add a file to the Statik repository")
 program.command("commit <message>").description("Commit changes to the Statik repository")
@@ -47,6 +46,7 @@ switch (program.args[0]) {
   case "jump":
     Jump(cwd, program.args[1]);
     break;
+  
   default:
     program.outputHelp();
     process.exit(0)

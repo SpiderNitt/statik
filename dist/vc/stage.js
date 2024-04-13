@@ -17,12 +17,11 @@ export async function Add(cwd, paths) {
             let snapshot = [];
             for (const path of paths) {
                 for await (const result of client.addAll(globSource(path, { recursive: true }))) {
-                    if (fs.statSync(cwd + "/" + path).isDirectory())
+                    if (fs.statSync(cwd + "/" + result.path).isDirectory())
                         continue;
                     snapshot.push(result);
                 }
             }
-            // console.log(snapshot)
             const result = await client.add(JSON.stringify(snapshot));
             fs.writeFileSync(cwd + "/.statik/SNAPSHOT", result.path);
             console.log("Files staged to IPFS with cid: " + result.path);
@@ -41,26 +40,27 @@ export async function Add(cwd, paths) {
                 prevContent = JSON.parse(data);
             }
             // Not optimized
+            let newContent = [];
             for (const path of paths) {
                 for await (const result of client.addAll(globSource(path, { recursive: true }))) {
                     // Check if the path is a directory
                     const path = result.path;
-                    if (fs.statSync(cwd + "/" + path).isDirectory())
+                    if (fs.statSync(cwd + "/" + path).isDirectory()) {
                         continue;
-                    let flag = true;
-                    for (const prev of prevContent) {
-                        if (prev.path == result.path) {
-                            prevContent.splice(prevContent.indexOf(prev), 1, result);
-                            flag = false;
-                            break;
-                        }
                     }
-                    if (flag)
-                        prevContent.push(result);
+                    newContent.push(result);
                 }
             }
-            const result = await client.add(JSON.stringify(prevContent));
-            // console.log(result.path,prevSnapshot)
+            let newContentaddedpaths = [];
+            newContent.forEach((e) => {
+                newContentaddedpaths.push(e.path);
+            });
+            prevContent.forEach((e) => {
+                if (!newContentaddedpaths.includes(e.path)) {
+                    newContent.push(e);
+                }
+            });
+            const result = await client.add(JSON.stringify(newContent));
             if (result.path == prevSnapshot) {
                 console.log("There are no changes to add");
                 return;
