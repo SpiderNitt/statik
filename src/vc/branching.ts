@@ -8,32 +8,6 @@ import { multihashToCID } from "../utils/cid.js";
 import { isOverriding } from "../utils/changes.js";
 import { commitContent } from "../utils/fetchContent.js";
 import { deleteAllFiles, readAllFiles } from "../utils/dirwalk.js";
-function deleteFoldersAndFilesExceptStatikAndPaths(cwd: string, pathsToKeep: string[]): void {
-    const statikPath = path.join(cwd, 'statik');
-
-    if (!fs.existsSync(statikPath)) {
-        return;
-    }
-
-    const filesAndFolders = fs.readdirSync(cwd);
-
-    for (const fileOrFolder of filesAndFolders) {
-        const filePath = path.join(cwd, fileOrFolder);
-
-        if (fileOrFolder === 'statik' || pathsToKeep.includes(filePath)) {
-            continue;
-        }
-
-        const stats = fs.statSync(filePath);
-
-        if (stats.isDirectory()) {
-            deleteFolderRecursive(filePath);
-        } else {
-            fs.unlinkSync(filePath);
-        }
-    }
-}
-
 function deleteFolderRecursive(folderPath: string): void {
     if (fs.existsSync(folderPath)) {
         fs.readdirSync(folderPath).forEach((file) => {
@@ -47,53 +21,34 @@ function deleteFolderRecursive(folderPath: string): void {
         fs.rmdirSync(folderPath);
     }
 }
+function deleteFoldersAndFilesExceptStatikAndPaths(cwd: string, pathsToKeep: string[]): void {
+    const statikPath = path.join(cwd, '.statik');
 
-function deleteFile(filePath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        // Use fs.unlink to delete the file
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                // If there's an error, reject the promise with the error
-                reject(err);
-                return;
-            }
-            // If deletion is successful, resolve the promise
-            resolve();
-        });
-    });
-}
-function deleteDirectoryRecursive(directoryPath:string,isfile:string) {
-    if (!fs.existsSync(directoryPath)) {
-        console.error("Directory does not exist:", directoryPath);
+    if (!fs.existsSync(statikPath)) {
         return;
     }
-  if(isfile=="1"){
-    deleteFile(directoryPath)
-    .then(() => {
-             })
-    .catch((err) => {
-    });
-    return ;
-  }
-    // Get all items in the directory
-    const items = fs.readdirSync(directoryPath);
 
-    items.forEach(item => {
-        const itemPath = path.join(directoryPath, item);
-        const stats = fs.statSync(itemPath);
+    const filesAndFolders = fs.readdirSync(cwd);
+
+    for (const fileOrFolder of filesAndFolders) {
+        const filePath = path.join(cwd, fileOrFolder);
+
+        if (fileOrFolder === '.statik' || pathsToKeep.includes(filePath)) {
+            continue;
+        }
+
+        const stats = fs.statSync(filePath);
 
         if (stats.isDirectory()) {
-            // Recursively delete subdirectories
-            deleteDirectoryRecursive(itemPath,isfile);
+            deleteFolderRecursive(filePath);
         } else {
-            // Delete files
-            fs.unlinkSync(itemPath);
+            fs.unlinkSync(filePath);
         }
-    });
-
-    // Finally, delete the empty directory
-    fs.rmdirSync(directoryPath);
+    }
 }
+
+
+
 export async function List(cwd: string){
     try{
         IsStatik(cwd)
@@ -190,6 +145,7 @@ let newBranchaddedpaths:string[]=[]
 newBranchContent.forEach((e:any)=>{
     newBranchaddedpaths.push(e.path)
 })
+console.log(newBranchaddedpaths)
             
            deleteFoldersAndFilesExceptStatikAndPaths(cwd,newBranchaddedpaths)
             let data
