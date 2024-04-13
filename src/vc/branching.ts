@@ -145,7 +145,6 @@ let newBranchaddedpaths:string[]=[]
 newBranchContent.forEach((e:any)=>{
     newBranchaddedpaths.push(e.path)
 })
-console.log(newBranchaddedpaths)
             
            deleteFoldersAndFilesExceptStatikAndPaths(cwd,newBranchaddedpaths)
             let data

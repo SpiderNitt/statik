@@ -133,7 +133,6 @@ export async function Jump(cwd, branch) {
             newBranchContent.forEach((e) => {
                 newBranchaddedpaths.push(e.path);
             });
-            console.log(newBranchaddedpaths);
             deleteFoldersAndFilesExceptStatikAndPaths(cwd, newBranchaddedpaths);
             let data;
             for (const obj of newBranchContent) {
