@@ -1,6 +1,6 @@
 {
   "name": "statikvc",
-  "version": "1.1.0-alpha",
+  "version": "1.1.2-alpha",
   "description": "An IPFS based version control system with static file hosting features. Basic functions like repo initiation, staging, committing, and logging have been implemented. (Under active development)",
   "exports": "./dist/index.js",
   "scripts": {
