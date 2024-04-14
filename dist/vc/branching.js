@@ -147,7 +147,6 @@ export async function Jump(cwd, branch) {
                     data = Buffer.from(itr).toString();
                     if (data) {
                         fs.writeFileSync(path1, data);
-                        console.log(data);
                     }
                     else {
                     }
