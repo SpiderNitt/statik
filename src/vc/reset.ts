@@ -9,53 +9,11 @@ import { isOverriding } from "../utils/changes.js";
 import { commitContent } from "../utils/fetchContent.js";
 import { deleteAllFiles, readAllFiles } from "../utils/dirwalk.js";
 import { Switch } from "./Switch.js";
-function deleteFolderRecursive(folderPath: string): void {
-    if (fs.existsSync(folderPath)) {
-        fs.readdirSync(folderPath).forEach((file) => {
-            const curPath = path.join(folderPath, file);
-            if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            } else { // delete file
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(folderPath);
-    }
-}
-function deleteFoldersAndFilesExceptStatikAndPaths(cwd: string, pathsToKeep: string[]): void {
-    const statikPath = path.join(cwd, '.statik');
-
-    if (!fs.existsSync(statikPath)) {
-        return;
-    }
-
-    const filesAndFolders = fs.readdirSync(cwd);
-
-    for (const fileOrFolder of filesAndFolders) {
-        const filePath = path.join(cwd, fileOrFolder);
-
-        if (fileOrFolder === '.statik' || pathsToKeep.includes(filePath)) {
-            continue;
-        }
-
-        const stats = fs.statSync(filePath);
-
-        if (stats.isDirectory()) {
-            deleteFolderRecursive(filePath);
-        } else {
-            fs.unlinkSync(filePath);
-        }
-    }
-}
-
-
-
 
 
 export async function hardreset(CID:string) {
     
         let cwd=process.cwd();
-        let client = create({url: FetchConfig(cwd).ipfs_node_url})
     IsStatik(cwd)
     const currentBranch = fs.readFileSync(cwd+"/.statik/HEAD").toString()
     fs.writeFileSync(cwd+"/.statik/heads/"+currentBranch,CID)
