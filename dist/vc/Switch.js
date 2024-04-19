@@ -41,6 +41,7 @@ function deleteFoldersAndFilesExceptStatikAndPaths(cwd, pathsToKeep) {
     }
 }
 export async function List(cwd) {
+    console.log("done");
     try {
         IsStatik(cwd);
         // List all files
@@ -74,6 +75,7 @@ export async function Switch(cwd, CID) {
             const client = create({ url: FetchConfig(cwd).ipfs_node_url });
             // Check for unstaged changes
             const headContent = await commitContent(currentHead, client);
+            console.log(commitId);
             // Handle the case where not unstaged but overriding
             // Solution: Prevent only if added files and deleted files are overriding
             // Check for overriding changes
@@ -83,6 +85,7 @@ export async function Switch(cwd, CID) {
             }
             else {
                 newcommitContent = await commitContent(commitId, client);
+                console.log("djcin");
             }
             // Conditionally delete files. Exempt new files under basepath
             let basepathnew;
@@ -114,6 +117,7 @@ export async function Switch(cwd, CID) {
                 fs.mkdirSync(dirname, { recursive: true });
                 for await (const itr of asyncitr) {
                     data = Buffer.from(itr).toString();
+                    console.log(data);
                     if (data) {
                         fs.writeFileSync(path1, data);
                     }
