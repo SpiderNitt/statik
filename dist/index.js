@@ -18,7 +18,7 @@ program.command("commit <message>").description("Commit changes to the Statik re
 program.command("log").description("View the commit history of the current branch");
 program.command("branch").description("List all branches in the Statik repository");
 program.command("jump <branch>").description("Switch between branches");
-program.command("switch <CID>").description("Switch between commits");
+program.command("switch <CID>").description("Switch between commits,switch <head> to jump to head commit'");
 program.parse(process.argv);
 if (program.args.length < 1) {
     program.outputHelp();
