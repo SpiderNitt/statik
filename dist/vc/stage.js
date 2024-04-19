@@ -22,6 +22,7 @@ export async function Add(cwd, paths) {
                     snapshot.push(result);
                 }
             }
+            console.log(snapshot);
             const result = await client.add(JSON.stringify(snapshot));
             fs.writeFileSync(cwd + "/.statik/SNAPSHOT", result.path);
             console.log("Files staged to IPFS with cid: " + result.path);
@@ -56,7 +57,14 @@ export async function Add(cwd, paths) {
                 newContentaddedpaths.push(e.path);
             });
             prevContent.forEach((e) => {
-                if (!newContentaddedpaths.includes(e.path)) {
+                let flag = false;
+                if (fs.existsSync(e.path)) {
+                    flag = false;
+                }
+                else {
+                    flag = true;
+                }
+                if (!newContentaddedpaths.includes(e.path) && !flag) {
                     newContent.push(e);
                 }
             });

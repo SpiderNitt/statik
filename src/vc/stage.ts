@@ -24,6 +24,7 @@ export async function Add(cwd:string,paths:string[]){
                     snapshot.push(result)
                 }
             }
+            console.log(snapshot)
             const result = await client.add(JSON.stringify(snapshot))
             fs.writeFileSync(cwd+"/.statik/SNAPSHOT",result.path)
             console.log(
@@ -62,9 +63,17 @@ newContent.forEach((e:any)=>{
 })
 
 prevContent.forEach((e:any)=>{
-    if(!newContentaddedpaths.includes(e.path)){
+
+    let flag=false
+    if (fs.existsSync(e.path)) {
+flag=false
+    } else {
+flag=true
+    }
+    if(!newContentaddedpaths.includes(e.path)&&!flag){
         newContent.push(e);
     }
+   
 })
 
           
